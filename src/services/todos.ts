@@ -12,7 +12,7 @@ export async function getTodos(limit?: number, skip?: number) {
     }
 }
 
-export async function deleteTodo(id: number) {
+export async function deleteTodo(id?: number) {
     try {
         const response = await http.delete(`/${id}`);
         return response;

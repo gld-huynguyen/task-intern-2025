@@ -9,9 +9,13 @@ import AddTodos from "../components/AddTodos";
 import { ToDo } from "../models/ToDo";
 import { ConfirmDialog } from "primereact/confirmdialog"; // For <ConfirmDialog /> component
 import CheckToDoBox from "../components/CheckToDoBox";
+import { useAppSelector } from "../hooks/useAppSelector";
+import { useAppDispatch } from "../hooks/useAppDispatch";
+import { todoActions } from "../lib/redux-toolkit/todoSlice";
 
 const Dashboard = () => {
-    const [todos, setTodos] = useState<ToDo[]>([]);
+    const todoSlice = useAppSelector((state) => state.todo);
+    const dispatch = useAppDispatch();
     const [limit, setLimit] = useState(5);
     const [skip, setSkip] = useState(0);
 
@@ -19,6 +23,7 @@ const Dashboard = () => {
         isLoading,
         data,
         refetch: refetchTodos,
+        isSuccess,
     } = useQuery({
         queryKey: ["todos"],
         queryFn: () => getTodos(limit, skip),
@@ -31,10 +36,10 @@ const Dashboard = () => {
     }, [limit, skip, refetchTodos]);
 
     useEffect(() => {
-        if (data) {
-            setTodos(data.data.todos);
+        if (isSuccess) {
+            dispatch(todoActions.setTodo(data.data.todos));
         }
-    }, [data]);
+    }, [isSuccess, data, dispatch]);
 
     function onPageChange(event: {
         first: number;
@@ -55,7 +60,7 @@ const Dashboard = () => {
             <AddTodos />
             <ConfirmDialog />
             <div className="flex-1 flex-grow-0">
-                <DataTable value={todos} size="small">
+                <DataTable value={todoSlice} size="small">
                     <Column field={"id"} header="ID"></Column>
                     <Column field="todo" header="Title"></Column>
                     <Column
